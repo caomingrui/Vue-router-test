@@ -1,60 +1,109 @@
 <template>
   <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-router" target="_blank" rel="noopener">router</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-vuex" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div class="cont">
+      <mavMenuC></mavMenuC>
+      <div class="tabels" :style="this.$store.state.navCheck?'width: calc(100% - 20px);':'width: calc(100% - 200px);'">
+          <div class="tabels_nav">
+              <i :class="this.$store.state.navCheck?'el-icon-s-unfold':'el-icon-s-fold'" @click="check"></i>
+              <div>
+
+                  <el-dropdown>
+                      <span class="el-dropdown-link">
+                        <i class="el-icon-s-custom"></i> 我的
+                      </span>
+                      <el-dropdown-menu slot="dropdown">
+                          <el-dropdown-item icon="el-icon-setting" @click.native="exit">退出登录</el-dropdown-item>
+                      </el-dropdown-menu>
+                  </el-dropdown>
+              </div>
+<!--              <el-button type="primary" >退出登录</el-button>-->
+          </div>
+          <bb>
+              <el-breadcrumb separator="/">
+                  <el-breadcrumb-item v-for="item in levelList" :key="item.path" :to="item.path">{{item.name}}</el-breadcrumb-item>
+              </el-breadcrumb>
+          </bb>
+      </div>
+  </div>
   </div>
 </template>
 
 <script>
+  import mavMenuC from "./mavMenu";
+  import bb from './b'
+  import router from '../router/index'
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
-  }
+    data() {
+        return {
+            levelList: null
+        }
+    },
+  components:{
+    mavMenuC,
+    // aa,
+    bb
+  },
+    created() {
+        this.getBreadcrumb()
+    },
+    watch: {
+        $route() {
+            this.getBreadcrumb()
+        }
+    },
+  methods: {
+    exit() {
+        localStorage.removeItem('setRouList')
+        localStorage.removeItem('tk')
+        this.$store.commit('setRouList', [])
+        this.$store.commit('setToken', undefined)
+        this.$message({message: '退出成功呢', type: 'success'})
+        router.push('/')
+    },
+      getBreadcrumb() {
+        console.log(this.$route.matched)
+        let arr = this.$route.matched.filter(item => item.name)
+        console.log(arr)
+          this.levelList = this.$route.matched
+      },
+      check() {
+        let state = this.$store.state.navCheck
+          this.$store.commit('setCheck', !state)
+      },
+  },
 }
 </script>
 
 <!-- Add "scoped" attribute to limit CSS to this component only -->
 <style scoped>
-h3 {
-  margin: 40px 0 0;
-}
-ul {
-  list-style-type: none;
-  padding: 0;
-}
-li {
-  display: inline-block;
-  margin: 0 10px;
-}
-a {
-  color: #42b983;
-}
+    .cont {
+        width: 100%;
+        display: flex;
+    }
+    /*.hello .cont>div{*/
+    /*    padding: 15px;*/
+    /*}*/
+    .tabels {
+        /*width: 85%;*/
+        /*margin:0 40px;*/
+        /*width: 100%;*/
+        transition: .8s;
+    }
+    .tabels_nav {
+       padding: 0 20px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        height: 50px;
+        line-height: 50px;
+        box-shadow: 0 1px 2px 0 rgba(0,0,0,.05);
+    }
+    .tabels_nav i {
+        font-size: 16px;
+        cursor: pointer;
+    }
+    .hello .el-dropdown {
+        cursor:  pointer;
+    }
 </style>
